@@ -17,7 +17,7 @@ uint8_t PINC = 0;
 uint8_t PIND = 0;
 
 #include "map.h"
-#include "ports.h"
+#include "virtualport.h"
 
 //typedef VirtualPort<PortA1, PortA2, PortA3, PortB3, PortB4> PortX;
 //typedef VirtualPort<PortA2, PortA1, PortA3, PortB3, PortB4> PortX;
