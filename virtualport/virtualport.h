@@ -252,22 +252,13 @@ struct VirtualPort {
     }
 
     template<class T>
-    static void dirWrite(T value) {
+    static void toOutput(T value) {
         PortWriter<ports, AllPins...>::dirWrite(value);
     }
 
     template<class T>
     static void write(T value) {
         PortWriter<ports, AllPins...>::write(value);
-    }
-
-    template<class R>
-    static void asOutput() {
-        dirWrite((1 << sizeof(R)*8) - 1);
-    }
-
-    static void asInput() {
-        dirWrite(0);
     }
 };
 

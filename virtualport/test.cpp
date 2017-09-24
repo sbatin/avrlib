@@ -27,7 +27,7 @@ typedef VirtualPort<PortA1, PortA2, PortA3, PortB3, PortB4, PortD0, PortD1, Port
 typedef TList<PinWrapper<PortA0, 0>, PinWrapper<PortA3, 1> > TestPins;
 
 int main() {
-    PortX::asOutput<uint16_t>();
+    PortX::toOutput(0xFFFF);
     PortX::write(0x1255);
     printf("PortX=0x%X\n", PortX::read<uint16_t>());
     printf("PORTA=0x%X, PORTB=0x%X, PORTC=0x%X, PORTD=0x%X\n", PORTA, PORTB, PORTC, PORTD);
