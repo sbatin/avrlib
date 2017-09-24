@@ -44,13 +44,27 @@
 template<class PORT, size_t PinNumber>
 class TPin {
     public:
-        /*static void set() {
-            PORT::write(1 << PinNumber);
+        static void set() {
+            PORT::set(1 << PinNumber);
         }
 
         static void clr() {
-            PORT::write(0 << PinNumber);
-        }*/
+            PORT::clear(1 << PinNumber);
+        }
+
+        static void tgl() {
+            PORT::toggle(1 << PinNumber);
+        }
+
+        static void out() {
+            PORT::dirSet(1 << PinNumber);
+        }
+
+        template<typename T>
+        static void send(const T value) {
+            if (value) set();
+            else clr();
+        }
 
         typedef PORT Port;
         enum { number = PinNumber };
