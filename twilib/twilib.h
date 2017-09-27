@@ -119,3 +119,57 @@ void TWI_work() {
         TWI_status = 0;
     }
 }
+
+void TWI_initSlave(uint8_t address) {
+    TWAR = (address << 1);
+    TWCR = (1 << TWEN);
+}
+
+ISR(TWI_vect) {
+    switch (TWSR) {
+        // receiving data from master
+        case 0x60: // Own SLA+W has been received ACK has been returned
+        case 0x70: // Broadcast address has been received; ACK has been returned
+            TWI_bufPtr = 0;
+            TWCR = TWCR_MASTER_ACK;
+            TWI_status = TWI_BUSY;
+            break;
+
+        case 0x80: // Previously addressed with own SLA+W; data has been received; ACK has been returned
+        case 0x90: // Previously addressed with broadcast call; data has been received; ACK has been returned
+            //TODO: check that we have enough space in buffer
+            TWI_buf[TWI_bufPtr++] = TWDR;
+            TWCR = TWCR_MASTER_ACK;
+            break;
+
+        case 0xA0: // A STOP condition or repeated START condition has been received while still addressed as Slave
+            TWCR = TWCR_MASTER_ACK;
+            TWI_status = TWI_MSG_RECEIVED;
+            TWI_msgSize = TWI_bufPtr;
+            break;
+
+        // transmitting data to master
+        case 0xA8: // Own SLA+R has been received; ACK has been returned
+            TWI_bufPtr = 0;
+        case 0xB8: // Data byte in TWDR has been transmitted; ACK has been received
+            //TODO: send byte from TX buffer
+            TWDR = TWI_buf[TWI_bufPtr++];
+            TWCR = TWCR_MASTER_ACK;
+            break;
+
+        case 0xC0: // Data byte in TWDR has been transmitted; NOT ACK has been received
+            //TODO: check that we transmitted all the message
+            TWCR = TWCR_MASTER_ACK;
+            break;
+
+        case 0x88: // Previously addressed with own SLA+W; data has been received; NOT ACK has been returned
+        case 0x98: // Previously addressed with broadcast call; data has been received; NOT ACK has been returned
+        case 0xC8: // Last data byte in TWDR has been transmitted; ACK has been received
+        case 0x00: // Bus error due to an illegal START or STOP condition
+            TWCR = (1 << TWSTO) | (1 << TWINT);
+            break;
+
+        default:
+            TWCR = TWCR_MASTER_ACK;
+    }
+}
