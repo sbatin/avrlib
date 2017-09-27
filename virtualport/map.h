@@ -41,7 +41,7 @@
     typedef TPin<className, 6> className ## 6;\
     typedef TPin<className, 7> className ## 7;\
 
-template<class PORT, size_t PinNumber>
+template<class PORT, int PinNumber>
 class TPin {
     public:
         static void set() {
@@ -58,6 +58,11 @@ class TPin {
 
         static void out() {
             PORT::dirSet(1 << PinNumber);
+        }
+
+        static void pullUp() {
+            PORT::dirClear(1 << PinNumber);
+            PORT::set(1 << PinNumber);
         }
 
         template<typename T>

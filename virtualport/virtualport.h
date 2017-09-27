@@ -72,7 +72,7 @@ struct FromList<T, TList<Ts...> > {
  ********* virtual ports helpers ************
  */
 
-template<typename TPin, size_t Position>
+template<typename TPin, int Position>
 struct PinWrapper {
     typedef TPin Pin;
     enum { pos = Position };
@@ -88,18 +88,18 @@ struct BitMask<TList<T, Ts...> > {
     enum { value = (1 << T::Pin::number) | BitMask<TList<Ts...> >::value };
 };
 
-template <size_t, typename...>
+template <int, typename...>
 struct GetPinsWithPort {
     typedef TList<> value;
 };
 
-template <size_t Position, typename Port, typename... Ts, size_t Number>
+template <int Position, typename Port, typename... Ts, int Number>
 struct GetPinsWithPort<Position, Port, TPin<Port, Number>, Ts...> {
     typedef typename GetPinsWithPort<Position + 1, Port, Ts...>::value tail;
     typedef typename FromList<PinWrapper<TPin<Port, Number>, Position>, tail>::value value;
 };
 
-template <size_t Position, typename Port, typename T, typename... Ts>
+template <int Position, typename Port, typename T, typename... Ts>
 struct GetPinsWithPort<Position, Port, T, Ts...> {
     typedef typename GetPinsWithPort<Position + 1, Port, Ts...>::value value;
 };
@@ -140,7 +140,7 @@ struct PinMap<TList<W, Ws...> > {
     enum { mask = BitMask<PinsOfPort>::value };
 
     template<class R, class T>
-    static inline R map(size_t from, size_t to, const T &value) {
+    static inline R map(int from, int to, const T &value) {
         R result = 0;
 
         if (from == to)
@@ -154,8 +154,8 @@ struct PinMap<TList<W, Ws...> > {
 
     template<class R, class T>
     static inline R toValue(const T &value) {
-        auto pos = (size_t)W::pos;
-        auto pin = (size_t)W::Pin::number;
+        auto pos = (int)W::pos;
+        auto pin = (int)W::Pin::number;
 
         if (IsSerial<W, Ws...>::value) {
             if (pos > pin)
@@ -170,8 +170,8 @@ struct PinMap<TList<W, Ws...> > {
 
     template<class R, class T>
     static inline R fromValue(const T &value) {
-        auto pos = (size_t)W::pos;
-        auto pin = (size_t)W::Pin::number;
+        auto pos = (int)W::pos;
+        auto pin = (int)W::Pin::number;
 
         if (IsSerial<W, Ws...>::value) {
             if (pos > pin)
@@ -215,7 +215,7 @@ struct PortWriter<TList<Port, Ports...>, AllPins...> {
     static void dirWrite(T value) {
         auto result = PinMap<PinsOfPort>::template toValue<typename Port::DataT>(value);
 
-        if ((size_t)Length<PinsOfPort>::value == (size_t)Port::width)
+        if ((int)Length<PinsOfPort>::value == (int)Port::width)
             Port::dirWrite(result);
         else {
             Port::dirClear(mask);
@@ -229,7 +229,7 @@ struct PortWriter<TList<Port, Ports...>, AllPins...> {
     static void write(T value) {
         auto result = PinMap<PinsOfPort>::template toValue<typename Port::DataT>(value);
 
-        if ((size_t)Length<PinsOfPort>::value == (size_t)Port::width)
+        if ((int)Length<PinsOfPort>::value == (int)Port::width)
             Port::write(result);
         else
             Port::clearSet(mask, result);
@@ -254,6 +254,12 @@ struct VirtualPort {
     template<class T>
     static void toOutput(T value) {
         PortWriter<ports, AllPins...>::dirWrite(value);
+    }
+
+    template<class T>
+    static void pullUp(T value) {
+        toOutput(~value);
+        write(value);
     }
 
     template<class T>
