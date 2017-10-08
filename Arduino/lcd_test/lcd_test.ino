@@ -1,7 +1,7 @@
 #include "map.h"
 #include "virtualport.h"
 #include "encoder.h"
-#include "LCD.h"
+#include "Display.h"
 
 typedef LCD<16, 2, PortC5, PortC4, PortC3, PortC2, PortC1, PortC0> MyLcd;
 typedef Encoder<PortD0, PortD1> Enc1;

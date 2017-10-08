@@ -100,7 +100,7 @@ public:
         // Now we pull both RS and R/W low to begin commands
         RS::clr();
         EN::clr();
-    
+
         // we start in 8bit mode, try to set 4 bit mode
         writeToBus(0x03);
         _delay_us(4500); // wait min 4.1ms
@@ -112,14 +112,14 @@ public:
         _delay_us(150);
         // finally, set to 4-bit interface
         writeToBus(0x02);
-    
+
         // finally, set # lines, font size, etc.
         command(LCD_FUNCTIONSET | LCD_4BITMODE | LCD_2LINE | LCD_5x8DOTS);
-    
+
         // turn the display on with no cursor or blinking default
         command(LCD_DISPLAYCONTROL | LCD_DISPLAYON);
         clear();
-    
+
         // initialize to default text direction (for romance languages)
         command(LCD_ENTRYMODESET | LCD_ENTRYLEFT | LCD_ENTRYSHIFTDECREMENT);
     }
