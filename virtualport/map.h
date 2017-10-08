@@ -3,7 +3,7 @@
         public:\
             typedef uint8_t DataT;\
             static DataT read() {\
-                return portName;\
+                return pinName;\
             }\
             static void dirWrite(DataT value) {\
                 dirName = value;\
@@ -27,7 +27,6 @@
                 portName ^= value;\
             }\
             static void clearSet(DataT mask, DataT value) {\
-                printf("%s.clearSet: %X, %X\n", #portName, (DataT)~mask, value);\
                 portName = (portName & ~mask) | value;\
             }\
             enum { width = sizeof(DataT) * 8 };\
@@ -56,7 +55,7 @@ class TPin {
             PORT::toggle(1 << PinNumber);
         }
 
-        static void out() {
+        static void setOut() {
             PORT::dirSet(1 << PinNumber);
         }
 
@@ -75,7 +74,7 @@ class TPin {
         enum { number = PinNumber };
 };
 
-MAKE_AVR_PORT(PORTA, DDRA, PINA, PortA)
+//MAKE_AVR_PORT(PORTA, DDRA, PINA, PortA)
 MAKE_AVR_PORT(PORTB, DDRB, PINB, PortB)
 MAKE_AVR_PORT(PORTC, DDRC, PINC, PortC)
 MAKE_AVR_PORT(PORTD, DDRD, PIND, PortD)

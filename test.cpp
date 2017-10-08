@@ -4,20 +4,6 @@ typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;
 
-uint8_t UCSRA = 0;
-uint8_t UDRE = 0;
-uint8_t	UDR = 0;
-uint8_t UBRRL = 0;
-uint8_t UBRRH = 0;
-uint8_t UCSRB = 0;
-uint8_t UCSRC = 0;
-
-#define F_CPU 16000000
-#define TXEN 1
-#define URSEL 0
-#define UCSZ0 1
-#define UCSZ1 2
-
 uint8_t PORTA = 0;
 uint8_t PORTB = 0;
 uint8_t PORTC = 0;
@@ -31,10 +17,18 @@ uint8_t PINB = 0;
 uint8_t PINC = 0;
 uint8_t PIND = 0;
 
+void sync() {
+    PINA = PORTA;
+    PINB = PORTB;
+    PINC = PORTC;
+    PIND = PORTD;
+}
+
 #include "virtualport/map.h"
 #include "virtualport/virtualport.h"
-#include "serial/serial.h"
 #include "encoder/encoder.h"
+
+MAKE_AVR_PORT(PORTA, DDRA, PINA, PortA)
 
 //typedef VirtualPort<PortA1, PortA2, PortA3, PortB3, PortB4> PortX;
 //typedef VirtualPort<PortA2, PortA1, PortA3, PortB3, PortB4> PortX;
@@ -49,11 +43,10 @@ int main() {
     Enc1::capture();
     PortX::toOutput(0xFFFF);
     PortX::write(0x1255);
+    sync();
     printf("PortX=0x%X\n", PortX::read<uint16_t>());
     printf("PORTA=0x%X, PORTB=0x%X, PORTC=0x%X, PORTD=0x%X\n", PORTA, PORTB, PORTC, PORTD);
     printf("DDRA=0x%X, DDRB=0x%X, DDRC=0x%X, DDRD=0x%X\n", DDRA, DDRB, DDRC, DDRD);
-    printf("bitmask = %d\n", BitMask<TestPins>::value);
-    printf("length = %d\n", Length<TestPins>::value);
     printf("done\n");
     return 0;
 }

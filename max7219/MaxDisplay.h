@@ -4,13 +4,13 @@
 template <class DATA, class CLOCK>
 struct ShiftOut {
     static void init() {
-        DATA::out();
-        CLOCK::out();
+        DATA::setOut();
+        CLOCK::setOut();
     }
 
     static void write(uint8_t data) {
         uint8_t mask = 0x80;
-        
+
         while (mask)  {
             DATA::send(data & mask);
             CLOCK::set();
@@ -25,7 +25,7 @@ struct MaxDisplay {
     private:
         typedef ShiftOut<DI, CK> Bus;
 
-        static void sendToDevice(uint8_t addr, uint8_t opcode, uint8_t data) { 
+        static void sendToDevice(uint8_t addr, uint8_t opcode, uint8_t data) {
             LD::clr();
             for (uint8_t i = N; i > 0; i--) {
                 Bus::write(addr == N - i ? opcode : 0);
@@ -59,16 +59,16 @@ struct MaxDisplay {
             for (uint8_t i = 0; i < 8; i++)
                 sendToDevice(addr, i + 1, 0);
         }
-        
+
         static void write(uint8_t addr, uint8_t digit, uint8_t value, bool dp) {
             sendToDevice(addr, digit + 1, value | (dp ? (1 << 7) : 0));
         }
 
         static void init(uint8_t decMode) {
             Bus::init();
-            LD::out();
+            LD::setOut();
             LD::set();
-        
+
             for (uint8_t i = 0; i < N; i++) {
                 test(i, false);
                 scanLimit(i, 7);
